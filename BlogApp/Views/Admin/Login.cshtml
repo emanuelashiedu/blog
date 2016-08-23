@@ -1,0 +1,63 @@
+﻿@{
+    ViewBag.Title = "Login";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section headerNavigation {  @Html.Partial("_AdminNavigationPartial") }
+<div class="row borderwithradius">
+    <div class="headerbar">@BlogApp.Helpers.StaticValues.AdminLoginHeaderText</div>
+    @using (Html.BeginForm("Login", "Admin", FormMethod.Post, new { id = "submitForm" }))
+    { 
+        <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="row control-group">
+                <div class="form-group col-xs-12 floating-label-form-group controls">
+                    <label>&nbsp;</label>
+                    <input type="text" class="form-control" placeholder="User Name" name="UserName" id="userName">
+                    <p class="help-block text-danger"></p>
+                </div>
+            </div>
+            <div class="row control-group">
+                <div class="form-group col-xs-12 floating-label-form-group controls">
+                    <label>&nbsp;</label>
+                    <input type="password" class="form-control" placeholder="Password" name="UserPassword" id="userPassword">
+                    <p class="help-block text-danger"></p>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="form-group col-xs-12">
+                    <button type="submit" id="btnLogin" class="btn btn-default">Login</button>
+                </div>
+            </div>
+
+        </div>
+    }
+</div>
+@section scripts {
+    <script type="text/javascript">
+        Alert.createAlert();
+        var loginErrorMessage = $.trim('@ViewBag.Error');
+        $(function () {
+            if (loginErrorMessage != '') { Alert.showAlert({ type: 'error', title: 'Alert !', messages: [loginErrorMessage] }); }
+            $("#btnLogin").click(function () {
+                var userName = $.trim($("#userName").val());
+                var userPassword = $.trim($('#userPassword').val());
+
+
+                var messases = [];
+                if (userName == '') { messases.push(errorMessage["UserNameError"]); }
+                if (userPassword == '') { messases.push(errorMessage["PasswordError"]); }
+
+                if (messases.length > 0) {                   
+                    Alert.showAlert({ type: 'error', title: 'Alert !', messages: messases });
+                    return false;
+                }
+                $.fn.showLoader(errorMessage["Validating"]);
+                return true;
+            });
+
+        });
+
+    </script>
+
+}

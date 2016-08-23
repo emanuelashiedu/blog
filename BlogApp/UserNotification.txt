@@ -1,0 +1,6 @@
+﻿{
+ "HomePage": "Keep the kids happy this summer with free entry to the Paintball Centre throughout the whole of August. Call us back to book a date: xxx-xxxx-xxx" ,
+ "BlogPage":"Receive discounts on tasty lunch specials. Text “LUNCH” to xxx-xxx-xxx and get a 2% discount on your next order! Your Daily Food.",
+ "ContactPage":"Receive discounts on tasty lunch specials. Text “LUNCH” to xxx-xxx-xxx and get a 2% discount on your next order! Your Daily Food.",
+ "AboutPage":"Receive discounts on tasty lunch specials. Text “LUNCH” to xxx-xxx-xxx and get a 2% discount on your next order! Your Daily Food."
+}

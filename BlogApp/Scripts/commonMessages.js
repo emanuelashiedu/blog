@@ -1,0 +1,20 @@
+﻿var errorMessage = [];
+errorMessage["BlogTitleError"] = "Please enter Blog Title.";
+errorMessage["BlogTextError"] = "Please enter Blog Text";
+errorMessage["LoginAgain"] = "Please login again to continue.";
+errorMessage["BlogSaveSuccess"] = "Blog detail saved successfully.";
+errorMessage["SomethingWrong"] = "We are sorry. Something wrong happened. Please try after some time.";
+errorMessage["UserNameError"] = "Please enter User Name.";
+errorMessage["PasswordError"] = "Please enter Password.";
+errorMessage["Validating"] = "Validating Please wait....";
+errorMessage["NoMoreData"] = "No more data found.";
+errorMessage["AdminUserNameError"] = "Please enter User Name.";
+errorMessage["AdminUserFirstNameError"] = "Please enter First Name.";
+errorMessage["AdminUserPasswordError"] = "Please enter Password.";
+errorMessage["AdminUserSuccess"] = "Admin User Added successfully.";
+errorMessage["AdminStatusSuccess"] = "User status updated successfully.";
+errorMessage["BlogStatusSuccess"] = "Blog status updated successfully.";
+
+var staticText = [];
+staticText["Postedby"] = "Posted by";
+staticText["on"] = "on";

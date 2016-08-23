@@ -1,0 +1,128 @@
+﻿@model BlogApp.Model.BlogDetail
+
+
+@{
+    ViewBag.Title = "Blog";
+}
+@section headerNavigation {  @Html.Partial("_NavigationHeaderPartial") }
+@{
+    
+    if (Model.BlogHeaderInfo != null)
+    {
+    @section headerImage {  @Html.Partial("_BlogHeaderPartial", Model.BlogHeaderInfo) }
+    }
+}
+
+<div class="row borderwithradius">
+    <div class="headerbar">Save Blog Detail</div>
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <div class="row control-group">
+            <div class="form-group col-xs-12 floating-label-form-group controls">
+                <label>&nbsp;</label>
+                <input type="text" class="form-control" placeholder="Blog Title" id="blogTitle" maxlength="500">
+                <p class="help-block text-danger"></p>
+            </div>
+        </div>
+         <div class="row control-group">
+            <div class="form-group col-xs-12 floating-label-form-group controls">
+                <label>&nbsp;</label>
+                <input type="text" class="form-control" placeholder="Blog Sub Title" id="blogSubTitle" maxlength="500">
+                <p class="help-block text-danger"></p>
+            </div>
+        </div>
+        <div class="row control-group">
+            <div class="form-group col-xs-12 floating-label-form-group controls">
+                <textarea rows="5" class="jqte-test form-control" id="blogText"></textarea>
+                <p class="help-block text-danger"></p>
+            </div>
+        </div>
+        <br> 
+        <div class="row">
+            <div class="form-group col-xs-12">
+                <button type="submit" id="btnSave" class="btn btn-default">Send</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+@section styles { <link rel="stylesheet" href="@Url.Content("/Content/jquery-te-1-4-0.css")" >}
+
+
+@section scripts {
+    <script src="@Url.Content("~/Scripts/jquery-te-1.4.0.min.js")"></script>
+    <script type="text/javascript">
+        
+        $(function () {
+
+                  
+            $("#blogText").jqte();
+               
+            
+            var blogid = '@Model.BlogInfo.BlogID';
+            var content = '@Model.BlogInfo.BlogText'
+
+            $("#blogText").parent().parent().find(".jqte_editor").html(content)
+            $('#blogTitle').val('@Model.BlogInfo.BlogTitle');
+            $('#blogSubTitle').val('@Model.BlogInfo.BlogSubTitle');
+
+
+
+            
+            Alert.createAlert();
+
+            $("#btnSave").click(function () {
+                var cookieValue = getCookie('.ASPXAUTH');
+                if (cookieValue == "" || cookieValue == null) { Alert.showAlert({ type: 'error', title: 'Alert !', messages: [errorMessage["LoginAgain"]] }); return; }
+
+                
+                var blogText = $.trim($("#blogText").val());
+                var blogTitle = $.trim($('#blogTitle').val());
+                var blogSubTitle = $.trim($('#blogSubTitle').val());
+
+
+                var messases = [];
+                if (blogTitle == '') { messases.push(errorMessage["BlogTitleError"]); }
+                if (blogText == '') { messases.push(errorMessage["BlogTextError"]); }
+
+                if (messases.length > 0) {
+                    Alert.showAlert({ type: 'error', title: 'Alert !', messages: messases });
+                    return false;
+                }
+
+
+                
+                var option = {};
+                option.HttpVerb = "POST";
+                option.async = 'async';
+                option.showLoading = true;
+                var blogInfo = {
+                    BlogText: blogText,
+                    BlogTitle: blogTitle,
+                    BlogSubTitle: blogSubTitle,
+                    BlogId: blogid
+                };
+                option.Data = "{'obj':" + JSON.stringify(blogInfo) + "}";
+                option.url = "@Url.Content("/Admin/UpdateBlog")";
+                $.fn.AjaxCommon(option, function (data) {
+                    if (data > 0) {
+                        $("#blogTitle,#blogSubTitle").val('');
+                        $("#blogText").jqteVal("");
+                        Alert.headerAlert({ autohide: true, type: 'success', message: errorMessage["BlogSaveSuccess"] });
+                    }
+                    else { Alert.showAlert({ type: 'error', title: 'Alert !', messages: [errorMessage["SomethingWrong"]] }); }
+                });
+            });
+        });
+
+    </script>
+
+
+    
+}
+
+
+
+
+
+
+

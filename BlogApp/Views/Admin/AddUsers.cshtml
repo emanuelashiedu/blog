@@ -1,0 +1,167 @@
+﻿@{
+    ViewBag.Title = "AddUsers";
+}
+@section headerNavigation {  @Html.Partial("_AdminNavigationPartial") }
+<div class="row borderwithradius">
+    <div class="headerbar">Save Blog Detail</div>
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <div class="row control-group">
+            <div class="form-group col-xs-12 floating-label-form-group controls">
+                <label>&nbsp;</label>
+                <input type="text" class="form-control" placeholder="User Name" id="userName">
+                <p class="help-block text-danger"></p>
+            </div>
+        </div>
+        <div class="row control-group">
+            <div class="form-group col-xs-12 floating-label-form-group controls">
+                <label>&nbsp;</label>
+                <input type="text" class="form-control" placeholder="First Name" id="userFirstName">
+                <p class="help-block text-danger"></p>
+            </div>
+        </div>
+        <div class="row control-group">
+            <div class="form-group col-xs-12 floating-label-form-group controls">
+                <label>&nbsp;</label>
+                <input type="text" class="form-control" placeholder="Last Name" id="userLastName">
+                <p class="help-block text-danger"></p>
+            </div>
+        </div>
+        <div class="row control-group">
+            <div class="form-group col-xs-12 floating-label-form-group controls">
+                <label>&nbsp;</label>
+                <input type="text" class="form-control" placeholder="Password" id="userPassword">&nbsp;&nbsp;<span id="spnStrength"></span>
+                <p class="help-block text-danger"></p>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="form-group col-xs-12">
+                <button type="submit" id="btnSave" class="btn btn-default">Add</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+<hr />
+<table class="tableMain">
+    <caption>Admin Users &nbsp;&nbsp;<a href="javascript:;" onclick="getAdminUsers();">Refresh List</a></caption>
+    <thead>
+        <tr>
+            <th>User Name</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody id="tbodyUsers">
+    </tbody>
+
+</table>
+<hr />
+<br />
+ 
+@section scripts {
+     
+    <script type="text/javascript">
+        $(function () { 
+            Alert.createAlert();
+            getAdminUsers();
+            $("#btnSave").click(function () {
+                var cookieValue = getCookie('.ASPXAUTH');
+                if (cookieValue == "" || cookieValue == null) { Alert.showAlert({ type: 'error', title: 'Alert !', messages: [errorMessage["LoginAgain"]] }); return; }
+
+                var userName = $.trim($("#userName").val());
+                var userFirstName = $.trim($('#userFirstName').val());
+                var userLastName = $.trim($('#userLastName').val());
+                var userPassword = $.trim($('#userPassword').val());
+
+                var messases = [];
+                if (userName == '') { messases.push(errorMessage["AdminUserNameError"]); }
+                if (userFirstName == '') { messases.push(errorMessage["AdminUserFirstNameError"]); }
+                if (userPassword == '') { messases.push(errorMessage["AdminUserPasswordError"]); }
+
+                if (messases.length > 0) {
+                    Alert.showAlert({ type: 'error', title: 'Alert !', messages: messases });
+                    return false;
+                }
+
+                var option = {};
+                option.HttpVerb = "POST";
+                option.async = 'async';
+                option.showLoading = true;
+                var userInfo = {
+                    UserName: userName,
+                    UserFirstName: userFirstName,
+                    UserLastName: userLastName,
+                    UserPassword: userPassword
+                };
+                option.Data = "{'userInfo':" + JSON.stringify(userInfo) + "}";
+                option.url = "@Url.Content("/Admin/AddNewUser")";
+                $.fn.AjaxCommon(option, function (data) {
+                    if (data > 0) {
+                        $("#userName,#userFirstName,#userLastName,#userPassword").val('');
+                        Alert.headerAlert({ autohide: true, type: 'success', message: errorMessage["AdminUserSuccess"] });
+                    }
+                    else { Alert.showAlert({ type: 'error', title: 'Alert !', messages: [errorMessage["SomethingWrong"]] }); }
+                });
+            });
+
+            /*****CHECK PASSWORD STRENGTH START*******/
+            $('#userPassword').keyup(function () {
+                var pwd = $.trim($(this).val());
+                var strength = passwordStrength(pwd);
+                var strengthType = "";
+                if (pwd != '') {
+                    if (strength == 0) { strengthType = "Short"; }
+                    else if (strength < 2) { strengthType = 'Weak' }
+                    else if (strength == 2) { strengthType = 'Good'; }
+                    else { strengthType = "Strong"; }
+                }
+                $('#spnStrength').html(strengthType).removeClass().addClass(strengthType);
+            });
+            /*****CHECK PASSWORD STRENGTH END*******/
+        });
+        function getAdminUsers() {
+            var option = {};
+            option.HttpVerb = "GET";
+            option.async = 'async';
+            option.showLoading = true;
+            option.Data = "";
+            option.url = "@Url.Content("/Admin/getUserList")";
+            $.fn.AjaxCommon(option, function (data) {
+                if (data == 'error') { Alert.showAlert({ type: 'error', title: 'Alert !', messages: [errorMessage["SomethingWrong"]] }); }
+                else if (data == null || data == [] || data == '[]' || data == '') { }
+                else {
+                    var jsonBlog = jQuery.parseJSON(data);
+                    var jsonLength = jsonBlog.length;
+                    var html = "";
+                    for (var i = 0; i < jsonLength; i++) {
+                        html += '<tr><td>' + jsonBlog[i]["UserName"] + '</td><td>' + jsonBlog[i]["FirstName"] + '</td><td>' + jsonBlog[i]["LastName"] + '</td><td><a id="a' + jsonBlog[i]["UserID"] + '" href="javascript:;"  onclick="InActiveUser(' + jsonBlog[i]["UserID"] + ',' + jsonBlog[i]["isActive"] + ')" >' + (jsonBlog[i]["isActive"] == true ? "Active" : "Inactive") + '</a></td></tr>';
+
+                    }
+                }
+                $('#tbodyUsers').html(html);
+            });
+        }
+        function InActiveUser(userID, isActive) {
+            var status = (isActive == true ? false : true);
+            var option = {};
+            option.HttpVerb = "POST";
+            option.async = 'async';
+            option.showLoading = true;
+            var userInfo = {
+                UserID: userID,
+                isActive: status
+            };
+            option.Data = "{'userInfo':" + JSON.stringify(userInfo) + "}";
+            option.url = "@Url.Content("/Admin/InactiveUser")";
+            $.fn.AjaxCommon(option, function (data) {
+                if (data > 0) {
+                    Alert.headerAlert({ autohide: true, type: 'success', message: errorMessage["AdminStatusSuccess"] });
+                    $("#a" + userID).replaceWith('<a id="a' + userID + '" href="javascript:;"  onclick="InActiveUser(' + userID + ',' + status + ')" >' + (status == true ? "Active" : "Inactive") + '</a>');
+                }
+                else { Alert.showAlert({ type: 'error', title: 'Alert !', messages: [errorMessage["SomethingWrong"]] }); }
+            });
+        }
+    </script>
+}

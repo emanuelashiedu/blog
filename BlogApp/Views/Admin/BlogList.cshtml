@@ -1,0 +1,102 @@
+﻿@{
+    ViewBag.Title = "BlogList";
+}
+@section headerNavigation {  @Html.Partial("_AdminNavigationPartial") }
+@section scripts {
+    <script type="text/javascript">
+        var PageSize = '@BlogApp.Helpers.StaticValues.PageSize';
+        var  pageNo = 0;
+        $(function () {
+            Alert.createAlert();
+            LoadBlogs("next");
+            $('#loadMore').click(function () { LoadBlogs(); });
+
+        });
+        function Refresh() {
+            pageNo = 0;
+            LoadBlogs("next");
+        }
+        function LoadBlogs(type) {
+
+            if (type == "prev") { pageNo = pageNo - 1; }
+            if (type == "next") { pageNo = pageNo + 1; }
+
+            if (pageNo == 1) { $('#divPrev').hide(); }
+            else { $('#divPrev').show(); }
+
+            
+
+            var option = {};
+            option.showLoading = true;
+            option.HttpVerb = "GET";
+            option.async = 'async';
+            var blogInfo = { pageNo: pageNo };
+            option.Data = blogInfo;
+            option.url = "@Url.Content("/Admin/getBlogs")";
+            option.onError = function () { if (type == "prev") { pageNo = pageNo + 1; } else if (type == "next") { pageNo = pageNo - 1; } }
+            $.fn.AjaxCommon(option, function (data) {
+                if (data == 'error') { Alert.showAlert({ type: 'error', title: 'Alert !', messages: [errorMessage["SomethingWrong"]] }); }
+                else if (data == null || data == [] || data == '[]' || data == '') { $('#ulLoadMore').hide(); Alert.headerAlert({ autohide: true, type: 'success', message: errorMessage["NoMoreData"] }); }
+                else {
+                    var jsonBlog = jQuery.parseJSON(data);
+                    var jsonLength = jsonBlog.length;
+                    var html = "";
+                    for (var i = 0; i < jsonLength; i++) {
+                        html += "<tr><td>" + jsonBlog[i]["Title"] + "</td><td>" + $.trim(jsonBlog[i]["SubTitle"]) + "</td><td>" + jsonBlog[i]["Name"] + "</td><td>" + jsonBlog[i]["Date"] + "</td><td><a id='a" + jsonBlog[i]["ID"] + "' href='javascript:;'  onclick='InActiveBlog(" + jsonBlog[i]["ID"] + "," + jsonBlog[i]["isActive"] + ")' >" + (jsonBlog[i]["isActive"] == true ? 'Active' : 'Inactive') + "</a></td><td><a href='@Url.Content("/Admin/Blog/")" + jsonBlog[i]["ID"] + "' target='_blank'>Edit</a></td></tr>";
+
+                    }
+
+                    if (jsonLength == PageSize) {  $('#divNext').show();  }
+                    else { $('#divNext').hide(); }
+
+                    $('#tbodyBlogs').html(html);
+                }
+
+            });
+        }
+        function InActiveBlog(ID, isActive) {
+            var status = (isActive == true ? false : true);
+            var option = {};
+            option.HttpVerb = "POST";
+            option.async = 'async';
+            option.showLoading = true;
+            var blogInfo = {
+                BlogID: ID,
+                isActive: status
+            };
+            option.Data = "{'blogInfo':" + JSON.stringify(blogInfo) + "}";
+            option.url = "@Url.Content("/Admin/InactiveBlog")";
+            $.fn.AjaxCommon(option, function (data) {
+                if (data > 0) {
+                    Alert.headerAlert({ autohide: true, type: 'success', message: errorMessage["BlogStatusSuccess"] });
+                    $("#a" + ID).replaceWith('<a id="a' + ID + '" href="javascript:;"  onclick="InActiveBlog(' + ID + ',' + status + ')" >' + (status == true ? "Active" : "Inactive") + '</a>');
+                }
+                else { Alert.showAlert({ type: 'error', title: 'Alert !', messages: [errorMessage["SomethingWrong"]] }); }
+            });
+        }
+    </script>
+}
+<div style="margin-top: 70px;">
+    <table class="tableMain">
+        <caption>Blogs &nbsp;&nbsp;<a href="javascript:;" onclick="Refresh();">Refresh List</a></caption>
+        <thead>
+            <tr>
+                <th>Blog Title</th>
+                <th>Blog SubTitle</th>
+                <th>Created By</th>
+                <th>Created Date</th>
+                <th>Status</th>
+                <th>Edit</th>
+
+            </tr>
+        </thead>
+        <tbody id="tbodyBlogs">
+        </tbody>
+    </table>
+    <div style="width: 100px; float: right; margin-right: 20px; margin-top: 10px; font-weight: bold; cursor: pointer;">
+        <div id="divPrev" style="float: left; display: none; cursor: pointer;" onclick="LoadBlogs('prev');">Prev</div>
+        &nbsp;
+        <div id="divNext" style="float: right; cursor: pointer;" onclick="LoadBlogs('next');">Next</div>
+    </div>
+</div>
+

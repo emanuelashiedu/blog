@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="BlogManagementModel" Alias="Self" p1:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:p1="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityContainer Name="BlogManagementEntities" p1:LazyLoadingEnabled="true">
+    <EntitySet Name="Blogs" EntityType="BlogManagementModel.Blog" />
+    <EntitySet Name="Roles" EntityType="BlogManagementModel.Role" />
+    <EntitySet Name="Users" EntityType="BlogManagementModel.User" />
+    <AssociationSet Name="FK_Blogs_CreatedBy" Association="BlogManagementModel.FK_Blogs_CreatedBy">
+      <End Role="Users" EntitySet="Users" />
+      <End Role="Blogs" EntitySet="Blogs" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Users_Role" Association="BlogManagementModel.FK_Users_Role">
+      <End Role="Roles" EntitySet="Roles" />
+      <End Role="Users" EntitySet="Users" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="Blog">
+    <Key>
+      <PropertyRef Name="BlogID" />
+    </Key>
+    <Property Name="BlogID" Type="Int32" Nullable="false" p1:StoreGeneratedPattern="Identity" />
+    <Property Name="BlogTitle" Type="String" MaxLength="500" Unicode="true" FixedLength="false" />
+    <Property Name="BlogText" Type="String" MaxLength="Max" Unicode="true" FixedLength="false" />
+    <Property Name="BlogCreatedDate" Type="DateTime" Precision="3" />
+    <Property Name="isActive" Type="Boolean" />
+    <Property Name="CreatedBy" Type="Int32" />
+    <Property Name="IP" Type="String" MaxLength="20" Unicode="false" FixedLength="false" />
+    <Property Name="BlogUpdatedDate" Type="DateTime" Precision="3" />
+    <Property Name="BlogUpdatedBy" Type="Int32" />
+    <NavigationProperty Name="User" Relationship="BlogManagementModel.FK_Blogs_CreatedBy" FromRole="Blogs" ToRole="Users" />
+    <Property Type="String" Name="BlogSubTitle" MaxLength="500" FixedLength="false" Unicode="true" />
+  </EntityType>
+  <EntityType Name="Role">
+    <Key>
+      <PropertyRef Name="RoleID" />
+    </Key>
+    <Property Name="RoleID" Type="Int16" Nullable="false" p1:StoreGeneratedPattern="Identity" />
+    <Property Name="RoleName" Type="String" MaxLength="50" Unicode="false" FixedLength="false" />
+    <Property Name="isActive" Type="Boolean" />
+    <NavigationProperty Name="Users" Relationship="BlogManagementModel.FK_Users_Role" FromRole="Roles" ToRole="Users" />
+  </EntityType>
+  <EntityType Name="User">
+    <Key>
+      <PropertyRef Name="UserID" />
+    </Key>
+    <Property Name="UserID" Type="Int32" Nullable="false" p1:StoreGeneratedPattern="Identity" />
+    <Property Name="UserName" Type="String" MaxLength="200" Unicode="false" FixedLength="false" />
+    <Property Name="UserFirstName" Type="String" MaxLength="100" Unicode="false" FixedLength="false" />
+    <Property Name="UserLastName" Type="String" MaxLength="100" Unicode="false" FixedLength="false" />
+    <Property Name="UserPassword" Type="String" MaxLength="20" Unicode="false" FixedLength="false" />
+    <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+    <Property Name="IP" Type="String" MaxLength="50" Unicode="false" FixedLength="false" />
+    <Property Name="isActive" Type="Boolean" />
+    <Property Name="UserRole" Type="Int16" />
+    <NavigationProperty Name="Blogs" Relationship="BlogManagementModel.FK_Blogs_CreatedBy" FromRole="Users" ToRole="Blogs" />
+    <NavigationProperty Name="Role" Relationship="BlogManagementModel.FK_Users_Role" FromRole="Users" ToRole="Roles" />
+  </EntityType>
+  <Association Name="FK_Blogs_CreatedBy">
+    <End Role="Users" Type="BlogManagementModel.User" Multiplicity="0..1" />
+    <End Role="Blogs" Type="BlogManagementModel.Blog" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Users">
+        <PropertyRef Name="UserID" />
+      </Principal>
+      <Dependent Role="Blogs">
+        <PropertyRef Name="CreatedBy" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Users_Role">
+    <End Role="Roles" Type="BlogManagementModel.Role" Multiplicity="0..1" />
+    <End Role="Users" Type="BlogManagementModel.User" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Roles">
+        <PropertyRef Name="RoleID" />
+      </Principal>
+      <Dependent Role="Users">
+        <PropertyRef Name="UserRole" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema>

@@ -1,0 +1,59 @@
+﻿@{
+    ViewBag.Title = "Home";
+}
+@section headerNavigation {  @Html.Partial("_NavigationHeaderPartial") }
+@section headerImage {  @Html.Partial("_HeaderPartial") }
+@section scripts {
+    <script type="text/javascript">
+        var pageNo = 1;
+        $(function () {
+            Alert.createAlert();
+            LoadBlogs();
+            Alert.geUsertNotification("HomePage");
+            $('#loadMore').click(function () { LoadBlogs(); });
+
+        });
+        function LoadBlogs() {
+            var option = {};
+            option.showLoading = true;
+            option.HttpVerb = "GET";
+            option.async = 'async';
+            var blogInfo = { pageNo: pageNo };
+            option.Data = blogInfo;
+            option.url = "@Url.Content("/Home/getBlogs")";
+            $.fn.AjaxCommon(option, function (data) {
+                $('#ulLoadMore').show();
+                if (data == 'error') { Alert.showAlert({ type: 'error', title: 'Alert !', messages: [errorMessage["SomethingWrong"]] }); }
+                else if (data == null || data == [] || data == '[]' || data == '') { $('#ulLoadMore').hide(); Alert.headerAlert({ autohide: true, type: 'success', message: errorMessage["NoMoreData"] }); }
+                else {
+                    var jsonBlog = jQuery.parseJSON(data);
+                    var jsonLength = jsonBlog.length;
+                    var html = "";
+                    for (var i = 0; i < jsonLength; i++) {
+                        html += "<div class='post-preview'><a href='@Url.Content("/Home/Blog/")" + jsonBlog[i]["ID"] + "'>";
+                        html += "<h2 class='post-title'>" + jsonBlog[i]["Title"] + "</h2><h3 class='post-subtitle'>" + jsonBlog[i]["Text"] + "</h3>";
+                        html += "</a>";
+                        html += "<p class='post-meta'>" + staticText["Postedby"] + " <a href='javascript:;'>" + jsonBlog[i]["Name"] + "</a> " + staticText["on"] + " " + jsonBlog[i]["Date"] + "</p>";
+                        html += "</div><hr>";
+                    }
+                    pageNo = pageNo + 1;
+                    $('#blogList').append(html);
+                }
+
+            });
+        }
+
+    </script>
+}
+<div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+
+        <div id="blogList"></div>
+        <!-- Pager -->
+        <ul class="pager" id="ulLoadMore" style="display:none;">
+            <li class="next">
+                <a href="javascript:;" id="loadMore">Older Posts &rarr;</a>
+            </li>
+        </ul>
+    </div>
+</div>

@@ -1,0 +1,24 @@
+﻿@model BlogApp.Model.BlogDetail
+
+@{
+    ViewBag.Title = "Blog";
+}
+@section headerNavigation {  @Html.Partial("_NavigationHeaderPartial") }
+@{
+    
+    if (Model.BlogHeaderInfo != null)
+    {
+    @section headerImage {  @Html.Partial("_BlogHeaderPartial", Model.BlogHeaderInfo) }
+    }
+}
+<div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        @{
+            if (Model.BlogInfo != null)
+            {
+            @Html.Raw(Model.BlogInfo.BlogText);
+            }
+        }
+    </div>
+</div>
+@section scripts {    <script type="text/javascript"> $(function () { Alert.geUsertNotification("BlogPage"); }); </script>}

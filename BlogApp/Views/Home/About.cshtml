@@ -1,0 +1,18 @@
+﻿@{
+    ViewBag.Title = "About";
+}
+
+@section headerNavigation {  @Html.Partial("_NavigationHeaderPartial") }
+@section headerImage {  @Html.Partial("_HeaderPartial") }
+
+<div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+         @Html.Raw(@BlogApp.Helpers.StaticValues.AboutUsText)
+    </div>
+</div>
+@section scripts {
+    <script type="text/javascript">
+        $(function () { Alert.geUsertNotification("AboutPage"); });
+
+    </script>
+}
